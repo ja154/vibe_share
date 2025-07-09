@@ -52,15 +52,17 @@
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15YWx0eWtnaWVqdGt2dnNlc2pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwNjYwMjAsImV4cCI6MjA2NzY0MjAyMH0.I9JtpCVyBNstVk27bvTV2m9ngyujdFPoQsHC6csUPfg';
         const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-
         // --- ICONS ---
         const FireIcon = () => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement('path', { fillRule: "evenodd", d: "M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 01-1.898-.632l4-12a1 1 0 011.265-.633zM10 4a1 1 0 011 1v10a1 1 0 11-2 0V5a1 1 0 011-1z", clipRule: "evenodd" }));
         const IdeaIcon = () => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement('path', { d: "M11 3a1 1 0 100 2h.01a1 1 0 100-2H11zM10.707 3.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L10 5.414l5.293 5.293a1 1 0 001.414-1.414l-7-7z" }));
         const HeartIcon = () => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", viewBox: "0 0 20 20", fill: "currentColor" }, React.createElement('path', { fillRule: "evenodd", d: "M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z", clipRule: "evenodd" }));
+        const LoadingSpinner = () => React.createElement('div', { className: "animate-spin rounded-full h-5 w-5 border-b-2 border-white" });
 
         // --- MODALS ---
-        const Modal = ({ children, onClose }) => React.createElement('div', { className: "fixed inset-0 bg-black/60 flex items-center justify-center z-20", onClick: onClose },
-            React.createElement('div', { className: "bg-card-bg w-full max-w-lg rounded-lg p-8 border border-border-color animate-fadeIn", onClick: e => e.stopPropagation() }, children)
+        const Modal = ({ children, onClose }) => React.createElement('div', { className: "fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4", onClick: onClose },
+            React.createElement('div', { className: "bg-card-bg w-full max-w-lg rounded-lg border border-border-color animate-fadeIn flex flex-col", onClick: e => e.stopPropagation() },
+                React.createElement('div', { className: "p-6 overflow-y-auto max-h-[90vh]" }, children)
+            )
         );
 
         const AuthModal = ({ onClose }) => {
@@ -90,8 +92,8 @@
                         if (error) throw error;
                         setMessage('Check your email for a confirmation link!');
                     }
-                } catch (error) {
-                    setError(error.message);
+                } catch (err) {
+                    setError(err.message);
                 } finally {
                     setLoading(false);
                 }
@@ -103,7 +105,9 @@
                     !isLoginView && React.createElement('input', { type: "text", placeholder: "Display Name", value: name, onChange: e => setName(e.target.value), className: "w-full bg-primary-bg border border-border-color rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neon-green", required: true }),
                     React.createElement('input', { type: "email", placeholder: "Email", value: email, onChange: e => setEmail(e.target.value), className: "w-full bg-primary-bg border border-border-color rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neon-green", required: true }),
                     React.createElement('input', { type: "password", placeholder: "Password", value: password, onChange: e => setPassword(e.target.value), className: "w-full bg-primary-bg border border-border-color rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neon-green", required: true }),
-                    React.createElement('button', { type: "submit", disabled: loading, className: "w-full bg-neon-green text-primary-bg font-bold py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50" }, loading ? 'Processing...' : (isLoginView ? 'Sign In' : 'Sign Up')),
+                    React.createElement('button', { type: "submit", disabled: loading, className: "w-full bg-neon-green text-primary-bg font-bold py-2 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center h-[42px]" }, 
+                        loading ? React.createElement(LoadingSpinner) : (isLoginView ? 'Sign In' : 'Sign Up')
+                    ),
                     error && React.createElement('p', { className: "text-red-500 text-sm text-center" }, error),
                     message && React.createElement('p', { className: "text-green-500 text-sm text-center" }, message)
                 ),
@@ -122,10 +126,11 @@
             const [imageFile, setImageFile] = useState(null);
             const [imagePreview, setImagePreview] = useState(null);
             const [loading, setLoading] = useState(false);
+            const [error, setError] = useState(null);
 
             const handleFileChange = (e) => {
-                if (e.target.files && e.target.files[0]) {
-                    const file = e.target.files[0];
+                const file = e.target.files?.[0];
+                if (file) {
                     setImageFile(file);
                     setImagePreview(URL.createObjectURL(file));
                 }
@@ -133,8 +138,9 @@
 
             const handleSubmit = async (e) => {
                 e.preventDefault();
+                setError(null);
                 if (!title || !description || !imageFile) {
-                    alert('Title, description, and an image are required.');
+                    setError('Title, description, and an image are required.');
                     return;
                 }
                 setLoading(true);
@@ -146,27 +152,24 @@
                     const { data: { publicUrl } } = supabase.storage.from('posts').getPublicUrl(filePath);
                     
                     const { error: insertError } = await supabase.from('posts').insert({
-                        title,
-                        description,
-                        code_link: codeLink,
+                        title, description, code_link: codeLink,
                         tags: tags.split(',').map(t => t.trim()).filter(Boolean),
-                        media_url: publicUrl,
-                        user_id: user.id
+                        media_url: publicUrl, user_id: user.id
                     });
                     if (insertError) throw insertError;
                     
                     onPostCreated();
                     onClose();
-                } catch (error) {
-                    alert('Error creating post: ' + error.message);
+                } catch (err) {
+                    setError(err.message);
                 } finally {
                     setLoading(false);
                 }
             };
 
             return React.createElement(Modal, { onClose },
-                React.createElement('h2', { className: "text-2xl font-bold text-neon-green" }, 'Create a New Vibe'),
-                React.createElement('form', { className: "mt-6 space-y-4", onSubmit: handleSubmit },
+                React.createElement('h2', { className: "text-2xl font-bold text-neon-green mb-6" }, 'Create a New Vibe'),
+                React.createElement('form', { className: "space-y-4", onSubmit: handleSubmit },
                     React.createElement('input', { type: "text", placeholder: "Title", value: title, onChange: e => setTitle(e.target.value), className: "w-full bg-primary-bg border border-border-color rounded-md px-3 py-2" }),
                     React.createElement('textarea', { placeholder: "Description", value: description, onChange: e => setDescription(e.target.value), className: "w-full bg-primary-bg border border-border-color rounded-md px-3 py-2 h-24" }),
                     React.createElement('input', { type: "url", placeholder: "Code Link (e.g., GitHub)", value: codeLink, onChange: e => setCodeLink(e.target.value), className: "w-full bg-primary-bg border border-border-color rounded-md px-3 py-2" }),
@@ -175,111 +178,41 @@
                         React.createElement('label', { className: "text-sm text-gray-400" }, 'Project Photo'),
                         React.createElement('input', { type: "file", accept:"image/*", onChange: handleFileChange, className: "w-full text-sm mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-neon-green file:text-primary-bg hover:file:bg-neon-green/90" })
                     ),
-                    imagePreview && React.createElement('img', { src: imagePreview, alt: "Project preview", className: "mt-4 w-full h-auto max-h-60 object-cover rounded-md" }),
+                    imagePreview && React.createElement('img', { src: imagePreview, alt: "Project preview", className: "mt-2 w-full h-auto max-h-60 object-cover rounded-md" }),
+                    error && React.createElement('p', { className: "text-red-500 text-sm" }, error),
                     React.createElement('div', { className: "flex justify-end space-x-3 pt-4" },
                         React.createElement('button', { type: "button", onClick: onClose, className: "px-4 py-2 rounded-md" }, 'Cancel'),
-                        React.createElement('button', { type: "submit", disabled: loading, className: "bg-neon-green text-primary-bg font-bold px-6 py-2 rounded-md disabled:opacity-50" }, loading ? 'Posting...' : 'Post')
-                    )
-                )
-            );
-        };
-
-        const EditProfileModal = ({ user, onClose, onProfileUpdated }) => {
-            const [name, setName] = useState(user.user_metadata.name);
-            const [githubUrl, setGithubUrl] = useState(user.user_metadata.github_url || '');
-            const [avatarFile, setAvatarFile] = useState(null);
-            const [avatarPreview, setAvatarPreview] = useState(user.user_metadata.avatar_url);
-            const [loading, setLoading] = useState(false);
-
-            const handleFileChange = (e) => {
-                if (e.target.files && e.target.files[0]) {
-                    const file = e.target.files[0];
-                    setAvatarFile(file);
-                    setAvatarPreview(URL.createObjectURL(file));
-                }
-            };
-            
-            const handleSubmit = async (e) => {
-                e.preventDefault();
-                setLoading(true);
-                try {
-                    let avatar_url = user.user_metadata.avatar_url;
-                    if (avatarFile) {
-                        const filePath = `public/${user.id}-avatar`;
-                        const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, avatarFile, { upsert: true });
-                        if (uploadError) throw uploadError;
-                        const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
-                        avatar_url = `${publicUrl}?t=${Date.now()}`;
-                    }
-
-                    const { data, error } = await supabase.auth.updateUser({
-                        data: { name, github_url: githubUrl, avatar_url }
-                    });
-                    if (error) throw error;
-                    
-                    onProfileUpdated();
-                    onClose();
-                } catch (error) {
-                    alert('Error updating profile: ' + error.message);
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            return React.createElement(Modal, { onClose },
-                React.createElement('h2', { className: "text-2xl font-bold text-neon-green" }, 'Edit Profile'),
-                React.createElement('form', { className: "mt-6 space-y-4", onSubmit: handleSubmit },
-                    React.createElement('div', { className: "flex items-center space-x-4" },
-                        React.createElement('img', { src: avatarPreview, alt: "Avatar preview", className: "w-20 h-20 rounded-full object-cover" }),
-                        React.createElement('div', null,
-                             React.createElement('label', { htmlFor: "avatar-upload", className: "cursor-pointer bg-neon-green/20 text-neon-green text-sm px-3 py-2 rounded-md" }, 'Upload New Photo'),
-                             React.createElement('input', { id: "avatar-upload", type: "file", accept:"image/*", onChange: handleFileChange, className: "hidden" })
+                        React.createElement('button', { type: "submit", disabled: loading, className: "bg-neon-green text-primary-bg font-bold px-6 py-2 rounded-md disabled:opacity-50 flex items-center justify-center h-[42px] w-[90px]" }, 
+                            loading ? React.createElement(LoadingSpinner) : 'Post'
                         )
-                    ),
-                    React.createElement('input', { type: "text", placeholder: "Display Name", value: name, onChange: e => setName(e.target.value), className: "w-full bg-primary-bg border border-border-color rounded-md px-3 py-2" }),
-                    React.createElement('input', { type: "url", placeholder: "GitHub URL", value: githubUrl, onChange: e => setGithubUrl(e.target.value), className: "w-full bg-primary-bg border border-border-color rounded-md px-3 py-2" }),
-                    React.createElement('div', { className: "flex justify-end pt-4" },
-                        React.createElement('button', { type: "submit", disabled: loading, className: "bg-neon-green text-primary-bg font-bold px-6 py-2 rounded-md disabled:opacity-50" }, loading ? 'Saving...' : 'Save Changes')
                     )
                 )
             );
         };
-        
-        const CodeCritiqueModal = ({ post, onClose }) => React.createElement(Modal, { onClose },
-            React.createElement('h2', { className: "text-2xl font-bold text-neon-green" }, 'Code Critique'),
-            React.createElement('p', { className: "text-sm text-gray-400 mt-1" }, `Get AI feedback for: "${post.title}"`),
-            React.createElement('textarea', { placeholder: "Paste your code snippet here...", className: "w-full bg-primary-bg border border-border-color rounded-md p-3 mt-4 h-48 font-mono text-sm" }),
-            React.createElement('div', { className: "text-center mt-4" },
-                React.createElement('button', { className: "bg-neon-green text-primary-bg font-bold px-8 py-2 rounded-md" }, 'Get Vibe Score')
-            )
-        );
 
-        // --- COMPONENTS ---
-        const PostCard = ({ post, onCritique, onReaction }) => {
-            const handleCopyLink = () => {
-                const ta = document.createElement('textarea');
-                ta.value = `${window.location.origin}/post/${post.id}`;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                alert('Link copied to clipboard!');
-            };
+        const PostCard = ({ post, currentUser, onDeletePost, onCritique, onReaction }) => {
+            const [showMenu, setShowMenu] = useState(false);
 
-            const user = post.users; // User data is now nested under 'users'
+            const user = post.users;
             const reactions = post.reactions || { fire: [], idea: [], heart: [] };
-            
+            const isOwner = currentUser?.id === post.user_id;
+
             return React.createElement('div', { className: "bg-card-bg border border-border-color rounded-lg overflow-hidden animate-fadeIn" },
                 React.createElement('div', { className: "p-4" },
                     React.createElement('div', { className: "flex items-center justify-between" },
                         React.createElement('div', { className: "flex items-center space-x-3" },
-                            React.createElement('img', { src: user?.avatar_url, alt: user?.name, className: "w-10 h-10 rounded-full" }),
+                            React.createElement('img', { src: user?.avatar_url, alt: user?.name, className: "w-10 h-10 rounded-full bg-primary-bg" }),
                             React.createElement('div', null,
                                 React.createElement('p', { className: "font-semibold" }, user?.name || 'Anonymous'),
                                 React.createElement('p', { className: "text-xs text-gray-400" }, new Date(post.created_at).toLocaleString())
                             )
                         ),
-                        React.createElement('button', { className: "text-gray-400" }, '...')
+                        isOwner && React.createElement('div', { className: "relative" },
+                            React.createElement('button', { onClick: () => setShowMenu(!showMenu), className: "text-gray-400 p-2" }, '...'),
+                            showMenu && React.createElement('div', { className: "absolute right-0 mt-2 w-48 bg-primary-bg border border-border-color rounded-md shadow-lg z-10" },
+                                React.createElement('button', { onClick: () => { onDeletePost(post.id); setShowMenu(false); }, className: "w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-card-bg" }, 'Delete Post')
+                            )
+                        )
                     ),
                     React.createElement('h2', { className: "text-xl font-bold mt-4 text-neon-green" }, post.title),
                     React.createElement('p', { className: "text-gray-300 mt-2" }, post.description),
@@ -287,30 +220,29 @@
                         post.tags?.map(tag => React.createElement('span', { key: tag, className: "bg-gray-800 text-neon-green text-xs px-2 py-1 rounded-full" }, tag))
                     )
                 ),
-                React.createElement('img', { src: post.media_url, alt: post.title, className: "w-full h-auto" }),
+                React.createElement('img', { src: post.media_url, alt: post.title, className: "w-full h-auto bg-primary-bg" }),
                 React.createElement('div', { className: "p-4" },
                     React.createElement('div', { className: "flex justify-between items-center" },
                         React.createElement('div', { className: "flex space-x-4" },
-                            React.createElement('button', { onClick: () => onReaction(post.id, 'fire'), className: "flex items-center space-x-1 text-gray-400 hover:text-white" }, React.createElement(FireIcon), React.createElement('span', null, reactions.fire.length)),
-                            React.createElement('button', { onClick: () => onReaction(post.id, 'idea'), className: "flex items-center space-x-1 text-gray-400 hover:text-white" }, React.createElement(IdeaIcon), React.createElement('span', null, reactions.idea.length)),
-                            React.createElement('button', { onClick: () => onReaction(post.id, 'heart'), className: "flex items-center space-x-1 text-gray-400 hover:text-white" }, React.createElement(HeartIcon), React.createElement('span', null, reactions.heart.length))
+                            React.createElement('button', { className: "flex items-center space-x-1 text-gray-400 hover:text-white" }, React.createElement(FireIcon), React.createElement('span', null, reactions.fire?.length || 0)),
+                            React.createElement('button', { className: "flex items-center space-x-1 text-gray-400 hover:text-white" }, React.createElement(IdeaIcon), React.createElement('span', null, reactions.idea?.length || 0)),
+                            React.createElement('button', { className: "flex items-center space-x-1 text-gray-400 hover:text-white" }, React.createElement(HeartIcon), React.createElement('span', null, reactions.heart?.length || 0))
                         ),
                         React.createElement('div', { className: "flex space-x-4" },
                             React.createElement('a', { href: post.code_link, target: "_blank", rel: "noopener noreferrer", className: "text-sm hover:text-neon-green" }, 'Code'),
-                            React.createElement('button', { onClick: () => onCritique(post), className: "text-sm hover:text-neon-green" }, 'Critique'),
-                            React.createElement('button', { onClick: handleCopyLink, className: "text-sm hover:text-neon-green" }, 'Copy Link')
+                            React.createElement('button', { onClick: () => onCritique(post), className: "text-sm hover:text-neon-green" }, 'Critique')
                         )
                     )
                 )
             );
         };
 
-        const Feed = ({ posts, onCritique, onReaction }) => {
+        const Feed = ({ posts, currentUser, onDeletePost, onCritique, onReaction }) => {
             if (posts.length === 0) {
                 return React.createElement('div', { className: "text-center text-gray-400 mt-10" }, 'No vibes shared yet. Be the first!');
             }
             return React.createElement('div', { className: "space-y-6" },
-                posts.map(post => React.createElement(PostCard, { key: post.id, post: post, onCritique: onCritique, onReaction: onReaction }))
+                posts.map(post => React.createElement(PostCard, { key: post.id, post, currentUser, onDeletePost, onCritique, onReaction }))
             );
         };
 
@@ -324,7 +256,7 @@
         };
 
         const Header = ({ user, onLogin, onLogout, onShare, onEditProfile }) => {
-            return React.createElement('header', { className: "sticky top-0 bg-primary-bg/80 backdrop-blur-sm border-b border-border-color z-10" },
+            return React.createElement('header', { className: "sticky top-0 bg-primary-bg/80 backdrop-blur-sm border-b border-border-color z-40" },
                 React.createElement('div', { className: "max-w-2xl mx-auto px-4 py-3 flex justify-between items-center" },
                     React.createElement('h1', { className: "text-2xl font-bold text-neon-green" }, 'Vibeshare'),
                     React.createElement('div', { className: "flex items-center space-x-4" },
@@ -350,16 +282,51 @@
             const [selectedPost, setSelectedPost] = useState(null);
 
             const fetchPosts = useCallback(async () => {
-                const { data, error } = await supabase
+                // 1. Fetch all posts
+                const { data: postsData, error: postsError } = await supabase
                     .from('posts')
-                    .select(`*, users ( name, avatar_url )`)
+                    .select(`*`)
                     .order('created_at', { ascending: false });
-                
-                if (error) {
-                    console.error('Error fetching posts:', error);
-                } else {
-                    setPosts(data);
+
+                if (postsError) {
+                    console.error('Error fetching posts:', postsError);
+                    setLoading(false);
+                    return;
                 }
+
+                if (!postsData || postsData.length === 0) {
+                    setPosts([]);
+                    setLoading(false);
+                    return;
+                }
+
+                // 2. Get all unique user IDs from the posts
+                const userIds = [...new Set(postsData.map(post => post.user_id))];
+
+                // 3. Fetch all corresponding user profiles in one query
+                const { data: usersData, error: usersError } = await supabase
+                    .from('users')
+                    .select(`id, name, avatar_url`)
+                    .in('id', userIds);
+
+                if (usersError) {
+                    console.error('Error fetching users:', usersError);
+                    // Still show posts, just without user info
+                    setPosts(postsData.map(p => ({...p, users: {}})));
+                    setLoading(false);
+                    return;
+                }
+
+                // 4. Create a map of userId -> user data for easy lookup
+                const usersMap = new Map(usersData.map(user => [user.id, user]));
+
+                // 5. Combine posts with user data
+                const postsWithUsers = postsData.map(post => ({
+                    ...post,
+                    users: usersMap.get(post.user_id) || { name: 'Anonymous', avatar_url: '' } // Attach user data, provide fallback
+                }));
+
+                setPosts(postsWithUsers);
                 setLoading(false);
             }, []);
 
@@ -376,85 +343,46 @@
                 getSession();
 
                 const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-                    setUser(session?.user ?? null);
-                    if (session?.user) {
+                    const currentUser = session?.user;
+                    setUser(currentUser ?? null);
+                    if (currentUser) {
                         fetchPosts();
-                        setActiveModal(null);
+                        if (activeModal === 'auth') setActiveModal(null);
                     }
                 });
 
-                return () => {
-                    authListener.subscription.unsubscribe();
-                };
-            }, [fetchPosts]);
+                return () => authListener.subscription.unsubscribe();
+            }, [fetchPosts, activeModal]);
 
             useEffect(() => {
                 const channel = supabase.channel('realtime posts')
                     .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, (payload) => {
-                        fetchPosts(); // Refetch all posts on any change
+                        fetchPosts();
                     })
                     .subscribe();
-
-                return () => {
-                    supabase.removeChannel(channel);
-                };
+                return () => supabase.removeChannel(channel);
             }, [fetchPosts]);
 
             const handleLogout = async () => {
                 await supabase.auth.signOut();
                 setPosts([]);
+                setUser(null);
             };
-            
-            const handleReaction = async (postId, reactionType) => {
-                if (!user) {
-                    alert('You must be logged in to react.');
-                    return;
-                }
-                
-                const { data: post, error } = await supabase.from('posts').select('reactions').eq('id', postId).single();
+
+            const handleDeletePost = async (postId) => {
+                if (!window.confirm("Are you sure you want to delete this post?")) return;
+                const { error } = await supabase.from('posts').delete().eq('id', postId);
                 if (error) {
-                    console.error('Error fetching reactions', error);
-                    return;
-                }
-
-                const reactions = post.reactions || { fire: [], idea: [], heart: [] };
-                const userId = user.id;
-
-                // Remove user from all reaction types first to ensure one reaction type per user
-                Object.keys(reactions).forEach(type => {
-                    const index = reactions[type].indexOf(userId);
-                    if (index > -1) {
-                        reactions[type].splice(index, 1);
-                    }
-                });
-
-                // Add or remove user from the specified reaction type
-                const reactionList = reactions[reactionType];
-                const userIndex = reactionList.indexOf(userId);
-
-                if (userIndex === -1) {
-                    reactionList.push(userId);
-                } // If user already reacted with this type, it's already removed. This toggles off.
-
-                const { error: updateError } = await supabase.from('posts').update({ reactions }).eq('id', postId);
-                if (updateError) {
-                    console.error('Error updating reactions', updateError);
+                    alert("Error deleting post: " + error.message);
+                } else {
+                    setPosts(posts.filter(p => p.id !== postId));
                 }
             };
             
-            const openCritiqueModal = (post) => {
-                setSelectedPost(post);
-                setActiveModal('codeCritique');
-            };
-
             const closeModal = () => {
                 setActiveModal(null);
                 setSelectedPost(null);
             };
-
-            if (loading && !user) {
-                return React.createElement('div', { className: "flex justify-center items-center h-screen text-neon-green" }, 'Loading Vibeshare...');
-            }
 
             return React.createElement('div', { className: "min-h-screen" },
                 React.createElement(Header, { 
@@ -465,7 +393,8 @@
                     onEditProfile: () => setActiveModal('editProfile')
                 }),
                 React.createElement('main', { className: "max-w-2xl mx-auto px-4 py-8" },
-                    user ? React.createElement(Feed, { posts: posts, onCritique: openCritiqueModal, onReaction: handleReaction }) : React.createElement(LandingPage, { onLogin: () => setActiveModal('auth') })
+                    loading && posts.length === 0 ? React.createElement('div', { className: "flex justify-center items-center h-64" }, React.createElement(LoadingSpinner)) :
+                    user ? React.createElement(Feed, { posts: posts, currentUser: user, onDeletePost: handleDeletePost }) : React.createElement(LandingPage, { onLogin: () => setActiveModal('auth') })
                 ),
                 activeModal === 'auth' && React.createElement(AuthModal, { onClose: closeModal }),
                 activeModal === 'createPost' && user && React.createElement(CreatePostModal, { user: user, onClose: closeModal, onPostCreated: fetchPosts }),
@@ -473,6 +402,86 @@
                 activeModal === 'codeCritique' && selectedPost && React.createElement(CodeCritiqueModal, { post: selectedPost, onClose: closeModal })
             );
         };
+
+        // EditProfileModal needs to be defined before App component uses it.
+        const EditProfileModal = ({ user, onClose, onProfileUpdated }) => {
+            const [name, setName] = useState(user.user_metadata.name || '');
+            const [githubUrl, setGithubUrl] = useState(user.user_metadata.github_url || '');
+            const [avatarFile, setAvatarFile] = useState(null);
+            const [avatarPreview, setAvatarPreview] = useState(user.user_metadata.avatar_url);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState(null);
+
+            const handleFileChange = (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                    setAvatarFile(file);
+                    setAvatarPreview(URL.createObjectURL(file));
+                }
+            };
+            
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setError(null);
+                setLoading(true);
+                try {
+                    let avatar_url = user.user_metadata.avatar_url;
+                    if (avatarFile) {
+                        const filePath = `public/${user.id}-avatar`;
+                        const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, avatarFile, { upsert: true });
+                        if (uploadError) throw uploadError;
+                        const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                        avatar_url = `${publicUrl}?t=${Date.now()}`;
+                    }
+
+                    const { error: updateUserError } = await supabase.auth.updateUser({
+                        data: { name, github_url: githubUrl, avatar_url }
+                    });
+                    if (updateUserError) throw updateUserError;
+                    
+                    // Also update the public users table
+                    const { error: publicUserError } = await supabase.from('users').update({ name, github_url: githubUrl, avatar_url }).eq('id', user.id);
+                    if(publicUserError) console.warn("Could not update public user profile, but auth profile was updated.");
+
+                    onProfileUpdated();
+                    onClose();
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return React.createElement(Modal, { onClose },
+                React.createElement('h2', { className: "text-2xl font-bold text-neon-green mb-6" }, 'Edit Profile'),
+                React.createElement('form', { className: "space-y-4", onSubmit: handleSubmit },
+                    React.createElement('div', { className: "flex items-center space-x-4" },
+                        React.createElement('img', { src: avatarPreview, alt: "Avatar preview", className: "w-20 h-20 rounded-full object-cover bg-primary-bg" }),
+                        React.createElement('div', null,
+                             React.createElement('label', { htmlFor: "avatar-upload", className: "cursor-pointer bg-neon-green/20 text-neon-green text-sm px-3 py-2 rounded-md" }, 'Upload New Photo'),
+                             React.createElement('input', { id: "avatar-upload", type: "file", accept:"image/*", onChange: handleFileChange, className: "hidden" })
+                        )
+                    ),
+                    React.createElement('input', { type: "text", placeholder: "Display Name", value: name, onChange: e => setName(e.target.value), className: "w-full bg-primary-bg border border-border-color rounded-md px-3 py-2" }),
+                    React.createElement('input', { type: "url", placeholder: "GitHub URL", value: githubUrl, onChange: e => setGithubUrl(e.target.value), className: "w-full bg-primary-bg border border-border-color rounded-md px-3 py-2" }),
+                    error && React.createElement('p', { className: "text-red-500 text-sm" }, error),
+                    React.createElement('div', { className: "flex justify-end pt-4" },
+                        React.createElement('button', { type: "submit", disabled: loading, className: "bg-neon-green text-primary-bg font-bold px-6 py-2 rounded-md disabled:opacity-50 flex items-center justify-center h-[42px] w-[140px]" }, 
+                            loading ? React.createElement(LoadingSpinner) : 'Save Changes'
+                        )
+                    )
+                )
+            );
+        };
+        
+        const CodeCritiqueModal = ({ post, onClose }) => React.createElement(Modal, { onClose },
+            React.createElement('h2', { className: "text-2xl font-bold text-neon-green" }, 'Code Critique'),
+            React.createElement('p', { className: "text-sm text-gray-400 mt-1" }, `Get AI feedback for: "${post.title}"`),
+            React.createElement('textarea', { placeholder: "Paste your code snippet here...", className: "w-full bg-primary-bg border border-border-color rounded-md p-3 mt-4 h-48 font-mono text-sm" }),
+            React.createElement('div', { className: "text-center mt-4" },
+                React.createElement('button', { className: "bg-neon-green text-primary-bg font-bold px-8 py-2 rounded-md" }, 'Get Vibe Score')
+            )
+        );
 
         const container = document.getElementById('root');
         const root = createRoot(container);
