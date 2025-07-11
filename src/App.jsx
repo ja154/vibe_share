@@ -12,6 +12,7 @@ const FeatureCard = ({ icon, title, description }) => {
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -20,6 +21,20 @@ const App = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const handleGetStarted = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleLearnMore = () => {
+    document.getElementById('features').scrollIntoView({ 
+      behavior: 'smooth' 
+    });
+  };
 
   if (isLoading) {
     return (
@@ -66,10 +81,16 @@ const App = () => {
             and build something amazing together.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fadeIn">
-            <button className="bg-neon-green text-black px-8 py-3 rounded-lg font-semibold hover:bg-green-400 transition-colors">
+            <button 
+              onClick={handleGetStarted}
+              className="bg-neon-green text-black px-8 py-3 rounded-lg font-semibold hover:bg-green-400 transition-colors"
+            >
               Get Started
             </button>
-            <button className="border border-neon-green text-neon-green px-8 py-3 rounded-lg font-semibold hover:bg-neon-green hover:text-black transition-colors">
+            <button 
+              onClick={handleLearnMore}
+              className="border border-neon-green text-neon-green px-8 py-3 rounded-lg font-semibold hover:bg-neon-green hover:text-black transition-colors"
+            >
               Learn More
             </button>
           </div>
@@ -132,6 +153,37 @@ const App = () => {
           </div>
         </div>
       </footer>
+
+      {/* Get Started Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-card-bg border border-border-color rounded-lg p-8 max-w-md w-full mx-4">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-neon-green rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-black font-bold text-2xl">🚀</span>
+              </div>
+              <h3 className="text-2xl font-bold mb-4">Welcome to Vibeshare!</h3>
+              <p className="text-gray-300 mb-6">
+                Ready to start sharing your code and creative projects? Join our community of developers and creators.
+              </p>
+              <div className="space-y-3">
+                <button className="w-full bg-neon-green text-black py-3 rounded-lg font-semibold hover:bg-green-400 transition-colors">
+                  Create Account
+                </button>
+                <button className="w-full border border-neon-green text-neon-green py-3 rounded-lg font-semibold hover:bg-neon-green hover:text-black transition-colors">
+                  Sign In
+                </button>
+                <button 
+                  onClick={handleCloseModal}
+                  className="w-full text-gray-400 py-2 hover:text-white transition-colors"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
