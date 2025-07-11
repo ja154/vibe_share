@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "vibe-share-2d059"
+    "primary": "vibeshare-code-create",
+    "backup": "vibe-share-2d059"
   }
 }
