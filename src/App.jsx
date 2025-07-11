@@ -208,13 +208,10 @@ const App = () => {
 
       {/* Get Started Modal */}
       {showModal && (
-              )
-              }
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           onClick={handleCloseModal}
         >
-          <div className="bg-card-bg border border-border-color rounded-lg p-8 max-w-md w-full mx-4">
           <div 
             className="bg-card-bg border border-border-color rounded-lg p-8 max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
