@@ -31,9 +31,31 @@ const App = () => {
   };
 
   const handleLearnMore = () => {
-    document.getElementById('features').scrollIntoView({ 
-      behavior: 'smooth' 
-    });
+    const featuresSection = document.getElementById('features');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ 
+        behavior: 'smooth' 
+      });
+    } else {
+      console.warn('Features section not found');
+    }
+  };
+
+  const handleNavClick = (sectionId) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ 
+        behavior: 'smooth' 
+      });
+    } else {
+      console.warn(`Section ${sectionId} not found`);
+    }
+  };
+
+  const handleAuthAction = (action) => {
+    console.log(`${action} clicked - would redirect to authentication`);
+    // In a real app, this would handle authentication
+    alert(`${action} functionality would be implemented here`);
   };
 
   if (isLoading) {
@@ -62,9 +84,24 @@ const App = () => {
               </h1>
             </div>
             <nav className="hidden md:flex space-x-8">
-              <a href="#features" className="text-gray-300 hover:text-neon-green transition-colors">Features</a>
-              <a href="#about" className="text-gray-300 hover:text-neon-green transition-colors">About</a>
-              <a href="#contact" className="text-gray-300 hover:text-neon-green transition-colors">Contact</a>
+              <button 
+                onClick={() => handleNavClick('features')} 
+                className="text-gray-300 hover:text-neon-green transition-colors cursor-pointer"
+              >
+                Features
+              </button>
+              <button 
+                onClick={() => handleNavClick('about')} 
+                className="text-gray-300 hover:text-neon-green transition-colors cursor-pointer"
+              >
+                About
+              </button>
+              <button 
+                onClick={() => handleNavClick('contact')} 
+                className="text-gray-300 hover:text-neon-green transition-colors cursor-pointer"
+              >
+                Contact
+              </button>
             </nav>
           </div>
         </div>
@@ -146,9 +183,24 @@ const App = () => {
               <span className="text-gray-300">© 2025 Vibeshare. All rights reserved.</span>
             </div>
             <div className="flex space-x-6">
-              <a href="#" className="text-gray-300 hover:text-neon-green transition-colors">Privacy</a>
-              <a href="#" className="text-gray-300 hover:text-neon-green transition-colors">Terms</a>
-              <a href="#" className="text-gray-300 hover:text-neon-green transition-colors">Support</a>
+              <button 
+                onClick={() => alert('Privacy Policy would be displayed here')}
+                className="text-gray-300 hover:text-neon-green transition-colors cursor-pointer"
+              >
+                Privacy
+              </button>
+              <button 
+                onClick={() => alert('Terms of Service would be displayed here')}
+                className="text-gray-300 hover:text-neon-green transition-colors cursor-pointer"
+              >
+                Terms
+              </button>
+              <button 
+                onClick={() => alert('Support page would be displayed here')}
+                className="text-gray-300 hover:text-neon-green transition-colors cursor-pointer"
+              >
+                Support
+              </button>
             </div>
           </div>
         </div>
@@ -156,8 +208,15 @@ const App = () => {
 
       {/* Get Started Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={handleCloseModal}
+        >
           <div className="bg-card-bg border border-border-color rounded-lg p-8 max-w-md w-full mx-4">
+          <div 
+            className="bg-card-bg border border-border-color rounded-lg p-8 max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="text-center">
               <div className="w-16 h-16 bg-neon-green rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-black font-bold text-2xl">🚀</span>
@@ -167,10 +226,16 @@ const App = () => {
                 Ready to start sharing your code and creative projects? Join our community of developers and creators.
               </p>
               <div className="space-y-3">
-                <button className="w-full bg-neon-green text-black py-3 rounded-lg font-semibold hover:bg-green-400 transition-colors">
+                <button 
+                  onClick={() => handleAuthAction('Create Account')}
+                  className="w-full bg-neon-green text-black py-3 rounded-lg font-semibold hover:bg-green-400 transition-colors"
+                >
                   Create Account
                 </button>
-                <button className="w-full border border-neon-green text-neon-green py-3 rounded-lg font-semibold hover:bg-neon-green hover:text-black transition-colors">
+                <button 
+                  onClick={() => handleAuthAction('Sign In')}
+                  className="w-full border border-neon-green text-neon-green py-3 rounded-lg font-semibold hover:bg-neon-green hover:text-black transition-colors"
+                >
                   Sign In
                 </button>
                 <button 
