@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
+const FeatureCard = ({ icon, title, description }) => {
+  return (
+    <div className="bg-primary-bg border border-border-color rounded-lg p-6 hover:border-neon-green transition-colors">
+      <div className="text-4xl mb-4">{icon}</div>
+      <h4 className="text-xl font-semibold mb-2 text-white">{title}</h4>
+      <p className="text-gray-300">{description}</p>
+    </div>
+  );
+};
+
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
@@ -123,16 +132,6 @@ const App = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
-};
-
-const FeatureCard = ({ icon, title, description }) => {
-  return (
-    <div className="bg-primary-bg border border-border-color rounded-lg p-6 hover:border-neon-green transition-colors">
-      <div className="text-4xl mb-4">{icon}</div>
-      <h4 className="text-xl font-semibold mb-2 text-white">{title}</h4>
-      <p className="text-gray-300">{description}</p>
     </div>
   );
 };
