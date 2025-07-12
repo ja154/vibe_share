@@ -301,6 +301,8 @@ const MainApp = ({ user, onSignOut }) => {
 
   const fetchUserProfile = async () => {
     try {
+      if (!user?.id) return;
+      
       const { data } = await supabase
         .from('profiles')
         .select('*')
@@ -310,36 +312,32 @@ const MainApp = ({ user, onSignOut }) => {
       if (data) {
         setUserProfile(data);
       } else {
-        // Create profile if it doesn't exist
-        const { error } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            name: user.user_metadata?.name || user.email?.split('@')[0] || 'Anonymous',
-            avatar_url: '',
-            github_url: ''
-          });
-        
-        if (!error) {
-          fetchUserProfile(); // Retry fetching
-        }
+        // Profile will be created by database trigger
+        console.log('Profile not found, should be created by trigger');
       }
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error('Error fetching profile:', error.message);
     }
   };
 
   const fetchPosts = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching posts:', error);
+        setPosts([]);
+      } else {
+        console.log('Posts fetched:', data);
       setPosts(data || []);
+      }
     } catch (error) {
       console.error('Error fetching posts:', error);
+      setPosts([]);
     } finally {
       setLoading(false);
     }
