@@ -32,21 +32,6 @@ const AuthModal = ({ showModal, onClose }) => {
         if (error) throw error;
 
         if (data.user) {
-          // Create profile in profiles table
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert([
-              {
-                id: data.user.id,
-                name: name,
-                avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
-              }
-            ]);
-
-          if (profileError) {
-            console.error('Profile creation error:', profileError);
-          }
-
           setSuccess('Account created successfully! Please check your email to verify your account.');
           setEmail('');
           setPassword('');
