@@ -187,5 +187,3 @@ const AuthModal = ({ showModal, onClose }) => {
 };
 
 export default AuthModal;
-
-export default AuthModal
