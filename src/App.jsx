@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AuthModal from './components/AuthModal';
+import MainApp from './components/MainApp';
 import { supabase } from './lib/supabase';
 
 const FeatureCard = ({ icon, title, description }) => {
@@ -81,6 +82,11 @@ const App = () => {
       console.error('Error signing out:', error);
     }
   };
+
+  // If user is authenticated, show the main app
+  if (user) {
+    return <MainApp user={user} onSignOut={handleSignOut} />;
+  }
 
   if (isLoading) {
     return (
