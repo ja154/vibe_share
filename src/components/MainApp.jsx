@@ -294,6 +294,8 @@ const MainApp = ({ user, onSignOut }) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
 
+  console.log('MainApp rendered for user:', user?.email);
+
   useEffect(() => {
     fetchPosts();
     fetchUserProfile();

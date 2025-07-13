@@ -47,6 +47,7 @@ const AuthModal = ({ showModal, onClose }) => {
         if (error) throw error;
 
         setSuccess('Signed in successfully!');
+        console.log('User signed in successfully:', data.user?.email);
         setTimeout(() => {
           onClose();
         }, 1500);
