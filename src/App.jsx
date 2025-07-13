@@ -99,7 +99,7 @@ const App = () => {
 
   // If user is authenticated, show the main app
   if (user || forceShowMainApp) {
-    console.log('Rendering MainApp for user:', user.email);
+    console.log('Rendering MainApp for user:', user?.email);
     return <MainApp user={user || { id: 'demo', email: 'demo@example.com' }} onSignOut={handleSignOut} />;
   }
 
