@@ -288,7 +288,7 @@ const CreatePostModal = ({ showModal, onClose, onPostCreated }) => {
   );
 };
 
-const MainApp = ({ user, onSignOut }) => {
+const MainApp = ({ user, onSignOut, isSigningOut }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -384,9 +384,10 @@ const MainApp = ({ user, onSignOut }) => {
                 </div>
                 <button
                   onClick={onSignOut}
-                  className="text-gray-300 hover:text-neon-green transition-colors"
+                  disabled={isSigningOut}
+                  className="text-gray-300 hover:text-neon-green transition-colors disabled:opacity-50"
                 >
-                  Sign Out
+                  {isSigningOut ? 'Signing out...' : 'Sign Out'}
                 </button>
               </div>
             </div>

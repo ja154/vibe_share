@@ -83,24 +83,25 @@ const App = () => {
     }
   };
 
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
   const handleSignOut = async () => {
+    setIsSigningOut(true);
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error('Error signing out:', error);
     }
+    setIsSigningOut(false);
   };
 
   // Debug: Log current user state
   console.log('Current user state:', user);
   console.log('User authenticated:', !!user);
 
-  // Force show MainApp for debugging - remove this later
-  const forceShowMainApp = true;
-
   // If user is authenticated, show the main app
-  if (user || forceShowMainApp) {
+  if (user) {
     console.log('Rendering MainApp for user:', user?.email);
-    return <MainApp user={user || { id: 'demo', email: 'demo@example.com' }} onSignOut={handleSignOut} />;
+    return <MainApp user={user || { id: 'demo', email: 'demo@example.com' }} onSignOut={handleSignOut} isSigningOut={isSigningOut} />;
   }
 
   if (isLoading) {
