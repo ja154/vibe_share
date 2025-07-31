@@ -1,0 +1,9 @@
+
+> vibeshare-code-create@1.0.0 dev
+> vite --host
+
+
+  VITE v5.4.19  ready in 595 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: http://192.168.0.2:3000/
