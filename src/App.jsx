@@ -90,17 +90,9 @@ const App = () => {
     }
   };
 
-  // Debug: Log current user state
-  console.log('Current user state:', user);
-  console.log('User authenticated:', !!user);
-
-  // Force show MainApp for debugging - remove this later
-  const forceShowMainApp = true;
-
   // If user is authenticated, show the main app
-  if (user || forceShowMainApp) {
-    console.log('Rendering MainApp for user:', user?.email);
-    return <MainApp user={user || { id: 'demo', email: 'demo@example.com' }} onSignOut={handleSignOut} />;
+  if (user) {
+    return <MainApp user={user} onSignOut={handleSignOut} />;
   }
 
   if (isLoading) {
